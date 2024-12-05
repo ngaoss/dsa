@@ -1,9 +1,9 @@
 package student;
 
-public class binary {
+class Binary {
     Student root;
 
-    binary() {
+    Binary() {
         root = null;
     }
 
@@ -42,28 +42,31 @@ public class binary {
         return findStudent(root.right, id);
     }
 
-    void delete(int id) {
-        root = deleteRec(root, id);
+    boolean delete(int id) {
+        boolean[] isDeleted = new boolean[1];
+        root = deleteRec(root, id, isDeleted);
+        return isDeleted[0];
     }
 
-    Student deleteRec(Student root, int id) {
-        if (root == null) return root;
+    Student deleteRec(Student root, int id, boolean[] isDeleted) {
+        if (root == null) return null;
 
         if (id < root.id) {
-            root.left = deleteRec(root.left, id);
+            root.left = deleteRec(root.left, id, isDeleted);
         } else if (id > root.id) {
-            root.right = deleteRec(root.right, id);
+            root.right = deleteRec(root.right, id, isDeleted);
         } else {
+            isDeleted[0] = true;
             if (root.left == null)
                 return root.right;
             else if (root.right == null)
                 return root.left;
-
             root.id = minValue(root.right);
-            root.right = deleteRec(root.right, root.id);
+            root.right = deleteRec(root.right, root.id, isDeleted);
         }
         return root;
     }
+
 
     int minValue(Student root) {
         int minv = root.id;
@@ -89,23 +92,39 @@ public class binary {
             return searchRec(root.right, id);
     }
 
-
     void sort() {
-        inOrderTraversal();
+        Student[] students = createArray();
+        bubbleSort(students);
+        for (Student student : students) {
+            System.out.println("ID: " + student.id + ", Grade: " + student.grade +
+                    ", Name: " + student.name + ", Rank: " + student.rank);
+        }
     }
 
-    void inOrderTraversal() {
-        inOrderTraversalRec(root);
+    Student[] createArray() {
+        java.util.List<Student> list = new java.util.ArrayList<>();
+        inOrderList(root, list);
+        return list.toArray(new Student[0]);
     }
 
-    void inOrderTraversalRec(Student root) {
+    void inOrderList(Student root, java.util.List<Student> list) {
         if (root != null) {
-            inOrderTraversalRec(root.left);
-            System.out.println("ID: " + root.id + ", Grade: " +
-                    root.grade + ", Name: " + root.name +
-                    ", Rank: " + root.rank);
+            inOrderList(root.left, list);
+            list.add(root);
+            inOrderList(root.right, list);
+        }
+    }
 
-            inOrderTraversalRec(root.right);
+    void bubbleSort(Student[] students) {
+        int n = students.length;
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                if (students[j].id > students[j + 1].grade) {
+                    Student temp = students[j];
+                    students[j] = students[j + 1];
+                    students[j + 1] = temp;
+                }
+            }
         }
     }
 }
